@@ -14,7 +14,7 @@ Create AAD application
 3. Enter any name for application name.
 4. Select `WEB APPLICATION AND/OR WEB API`
 5. Enter `https://localhost:44300/` as `SIGN ON URL` 
-6. Enter `https://<tenant-name>/` as `APP ID URL`.  For instance, `https://mytenant.onmicrosoft.com/`.
+6. Enter `https://<tenant-name>/` as `APP ID URL`.  For instance, `https://mytenant.onmicrosoft.com/`.  You can find this information on the address URL of the portal (it starts with @mytenant.onmicrosoft.com).
 7. Once created, click `CONFIGURE` tab
 8. Select YES for `APPLICATION IS MULTI-TENANT` and save.
 10. On `Permission to other applications`, add `Windows Azure Management API` and check `Access Azure Service Management` for `Delegated Permissions` and save.
