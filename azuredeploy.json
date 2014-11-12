@@ -30,13 +30,13 @@
       ],
       "defaultValue": "0"
     },
-    "aadClientID": {
+    "aadClientId": {
       "type": "string",
-      "defaultValue": "Enter your AADClientID here"
+      "defaultValue": "[Enter your AADClientID here]"
     },
     "aadClientSecret": {
       "type": "string",
-      "defaultValue": "Enter your AADClientSecret here"
+      "defaultValue": "[Enter your AADClientSecret here]"
     },
     "repoUrl": {
       "type": "string"
@@ -85,7 +85,7 @@
             "appSettings": [
               {
                 "name": "AADClientID",
-                "value": "[parameters('aadClientID')]"
+                "value": "[parameters('aadClientId')]"
               },
               {
                 "name": "AADClientSecret",
