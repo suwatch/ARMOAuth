@@ -44,7 +44,9 @@ Test ARM apis
 Test with Azure Websites
 ========================
 1. Simply click below button.<br/>
-   [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/).
+   <a href="https://azuredeploy.net/" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+  </a>
   - Enter the Site Name or use the auto-generated one.
   - Enter `CLIENT ID` as AADClientID settings.
   - Enter `key` as AADClientSecret settings.
