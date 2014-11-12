@@ -51,7 +51,7 @@ Test with Azure Websites
   - Enter `CLIENT ID` as AADClientID settings.
   - Enter `key` as AADClientSecret settings.
   - Click Next and Deploy
-2. Go back to the AAD application on Azure Portal and add the site https url (such as https://<sitename>.azurewebsites.net) as the reply URL for AAD application.
-3. Simply browse to https://<sitename>.azurewebsites.net
+2. Go back to the AAD application on Azure Portal and add the site `https` url (such as `https://{sitename}.azurewebsites.net`) as the reply URL for AAD application.
+3. Simply browse to `https://{sitename}.azurewebsites.net`
   
 Any issue, do let me know.
