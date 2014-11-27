@@ -27,3 +27,5 @@ Areas/*
 Content/*
 Images/*
 Views/*
+web.config
+web.*.config

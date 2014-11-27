@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
+using System.IdentityModel;
 using System.IdentityModel.Selectors;
+using System.IdentityModel.Services;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Net;
@@ -21,14 +24,25 @@ namespace ARMOAuth.Modules
         public const string DeleteCookieFormat = "{0}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         public const int CookieChunkSize = 2000;
 
+        public static readonly CookieTransform[] DefaultCookieTransforms = new CookieTransform[]
+        {
+	        new DeflateCookieTransform(),
+	        new MachineKeyTransform()
+        };
+
         public static string AADClientId
         {
-            get { return Environment.GetEnvironmentVariable("AADClientId"); }
+            get { return ConfigurationManager.AppSettings["AADClientId"]; }
         }
 
         public static string AADClientSecret
         {
-            get { return Environment.GetEnvironmentVariable("AADClientSecret"); }
+            get { return ConfigurationManager.AppSettings["AADClientSecret"]; }
+        }
+
+        public bool Enabled
+        {
+            get { return !String.IsNullOrEmpty(AADClientId) && !String.IsNullOrEmpty(AADClientSecret); }
         }
 
         public void Dispose()
@@ -37,7 +51,10 @@ namespace ARMOAuth.Modules
 
         public void Init(HttpApplication context)
         {
-            context.AuthenticateRequest += AuthenticateRequest;
+            if (Enabled)
+            {
+                context.AuthenticateRequest += AuthenticateRequest;
+            }
         }
 
         public void AuthenticateRequest(object sender, EventArgs e)
@@ -209,16 +226,31 @@ namespace ARMOAuth.Modules
             return tenantId != null;
         }
 
-        // NOTE: secure the cookie
-        public static byte[] EncryptAndSignCookie(AADOAuth2AccessToken oauthToken)
+        public static byte[] EncodeCookie(AADOAuth2AccessToken token)
         {
-            return oauthToken.ToBytes();
+            var bytes = token.ToBytes();
+            for (int i = 0; i < DefaultCookieTransforms.Length; ++i)
+            {
+                bytes = DefaultCookieTransforms[i].Encode(bytes);
+            }
+            return bytes;
         }
 
-        // NOTE: secure the cookie
-        public static AADOAuth2AccessToken DecryptAndVerifySignatureCookie(byte[] bytes)
+        public static AADOAuth2AccessToken DecodeCookie(byte[] bytes)
         {
-            return AADOAuth2AccessToken.FromBytes(bytes);
+            try
+            {
+                for (int i = DefaultCookieTransforms.Length - 1; i >= 0; --i)
+                {
+                    bytes = DefaultCookieTransforms[i].Decode(bytes);
+                }
+                return AADOAuth2AccessToken.FromBytes(bytes);
+            }
+            catch (Exception)
+            {
+                // bad cookie
+                return null;
+            }
         }
 
         // NOTE: generate nonce
@@ -264,12 +296,15 @@ namespace ARMOAuth.Modules
             }
 
             var bytes = Convert.FromBase64String(strb.ToString());
-            var oauthToken = DecryptAndVerifySignatureCookie(bytes);
-            if (!oauthToken.IsValid())
+            var oauthToken = DecodeCookie(bytes);
+            if (oauthToken == null || !oauthToken.IsValid())
             {
                 try
                 {
-                    oauthToken = AADOAuth2AccessToken.GetAccessTokenByRefreshToken(oauthToken.TenantId, oauthToken.refresh_token, oauthToken.resource);
+                    if (oauthToken != null)
+                    {
+                        oauthToken = AADOAuth2AccessToken.GetAccessTokenByRefreshToken(oauthToken.TenantId, oauthToken.refresh_token, oauthToken.resource);
+                    }
                 }
                 catch (Exception)
                 {
@@ -294,7 +329,7 @@ namespace ARMOAuth.Modules
             var request = application.Context.Request;
             var response = application.Context.Response;
 
-            var bytes = EncryptAndSignCookie(oauthToken);
+            var bytes = EncodeCookie(oauthToken);
             var cookie = Convert.ToBase64String(bytes);
             var chunkCount = cookie.Length / CookieChunkSize + (cookie.Length % CookieChunkSize == 0 ? 0 : 1);
             for (int i = 0; i < chunkCount; ++i)

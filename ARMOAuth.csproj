@@ -47,6 +47,7 @@
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
+    <Reference Include="System.identitymodel.services" />
     <Reference Include="System.IdentityModel.Tokens.Jwt">
       <HintPath>ref\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
@@ -134,12 +135,9 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
+    <None Include="Web.template.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -179,6 +177,13 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <Target Name="CustomWebConfigTransform">
+    <TransformXml Condition="Exists('Web.$(Configuration).config')" source="Web.template.config" transform="Web.$(Configuration).config" destination="Web.config" />
+    <Copy Condition="!Exists('Web.$(Configuration).config')" SourceFiles="Web.template.config" DestinationFiles="Web.config" />
+  </Target>
+  <PropertyGroup>
+    <BuildDependsOn>CustomWebConfigTransform;$(BuildDependsOn);</BuildDependsOn>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
