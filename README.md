@@ -28,7 +28,7 @@ Test with localhost
 3. Copy `key` (client secret) and paste it in [this line](https://github.com/suwatch/ARMOAuth/blob/master/Modules/ARMOAuthModule.cs#L31).
 4. Build and run the project.
 5. On browser, it should redirect to login page.
-6. Enter AAD account and password.  You may experiment with account on the same or different AAD directory as the application. Currently, this does not work with MSA (live.com, hotmail.com, ...) accounts.
+6. Enter AAD account and password.  You may experiment with account on the same or different AAD directory as the application. <strong>Due to AAD limitation, this does not work with MSA (live.com, hotmail.com, ...) accounts</strong>.
 7. You should be prompt with OAuth allow/deny page, do accept it.
 
 Test ARM apis
